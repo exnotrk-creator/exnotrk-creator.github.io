@@ -1,0 +1,465 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ExNoTrk — Notes, Expenses & Split Tracker</title>
+  <meta name="description" content="ExNoTrk is a private-first Android app for notes, expense tracking, budget management, and group expense splitting. All data stays on your device." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Inter:wght@400;500&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --ink:       #0f0f12;
+      --ink-soft:  #4a4a5a;
+      --ink-faint: #8a8a9a;
+      --surface:   #fafafc;
+      --card:      #ffffff;
+      --border:    #e8e8f0;
+      --indigo:    #6366f1;
+      --indigo-dk: #4f46e5;
+      --indigo-lt: #eef2ff;
+      --amber:     #f59e0b;
+      --emerald:   #10b981;
+      --rose:      #f43f5e;
+      --radius:    14px;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--surface);
+      color: var(--ink);
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* ── NAV ── */
+    nav {
+      position: sticky; top: 0; z-index: 100;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 5vw;
+      height: 64px;
+      background: rgba(250,250,252,0.85);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+    }
+    .nav-logo {
+      font-family: 'Space Grotesk', sans-serif;
+      font-weight: 700; font-size: 1.2rem;
+      color: var(--ink); text-decoration: none;
+      display: flex; align-items: center; gap: 8px;
+    }
+    .nav-logo .dot { color: var(--indigo); }
+    .nav-links { display: flex; gap: 28px; }
+    .nav-links a {
+      font-size: 0.875rem; font-weight: 500;
+      color: var(--ink-soft); text-decoration: none;
+      transition: color 0.2s;
+    }
+    .nav-links a:hover { color: var(--indigo); }
+
+    /* ── HERO ── */
+    .hero {
+      max-width: 900px; margin: 0 auto;
+      padding: 100px 5vw 80px;
+      text-align: center;
+    }
+    .hero-badge {
+      display: inline-flex; align-items: center; gap: 6px;
+      background: var(--indigo-lt); color: var(--indigo-dk);
+      font-size: 0.8rem; font-weight: 600; letter-spacing: 0.04em;
+      padding: 5px 14px; border-radius: 100px;
+      margin-bottom: 28px;
+    }
+    .hero-badge .pulse {
+      width: 7px; height: 7px; border-radius: 50%;
+      background: var(--indigo);
+      animation: pulse 2s ease-in-out infinite;
+    }
+    @keyframes pulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.5; transform: scale(0.75); }
+    }
+    h1 {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: clamp(2.4rem, 6vw, 4rem);
+      font-weight: 700; line-height: 1.1;
+      letter-spacing: -0.02em;
+      margin-bottom: 20px;
+    }
+    h1 em {
+      font-style: normal;
+      background: linear-gradient(135deg, var(--indigo) 0%, #8b5cf6 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .hero-sub {
+      font-size: 1.15rem; color: var(--ink-soft);
+      max-width: 560px; margin: 0 auto 40px;
+    }
+    .hero-cta {
+      display: inline-flex; align-items: center; gap: 10px;
+      background: var(--indigo); color: #fff;
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 0.95rem; font-weight: 600;
+      padding: 14px 28px; border-radius: 12px;
+      text-decoration: none;
+      transition: background 0.2s, transform 0.15s;
+      box-shadow: 0 4px 14px rgba(99,102,241,0.35);
+    }
+    .hero-cta:hover { background: var(--indigo-dk); transform: translateY(-1px); }
+    .hero-note {
+      margin-top: 14px;
+      font-size: 0.8rem; color: var(--ink-faint);
+    }
+
+    /* ── PRIVACY STRIP ── */
+    .privacy-strip {
+      display: flex; justify-content: center; gap: 32px; flex-wrap: wrap;
+      margin: 60px auto 0;
+      padding: 24px 5vw;
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+      max-width: 800px;
+    }
+    .strip-item {
+      display: flex; align-items: center; gap: 8px;
+      font-size: 0.85rem; font-weight: 500; color: var(--ink-soft);
+    }
+    .strip-item svg { flex-shrink: 0; }
+
+    /* ── FEATURES ── */
+    .section { padding: 80px 5vw; max-width: 1080px; margin: 0 auto; }
+    .section-label {
+      font-size: 0.75rem; font-weight: 700; letter-spacing: 0.1em;
+      text-transform: uppercase; color: var(--indigo);
+      margin-bottom: 12px;
+    }
+    .section-title {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: clamp(1.6rem, 3.5vw, 2.4rem);
+      font-weight: 700; line-height: 1.2;
+      letter-spacing: -0.02em;
+      margin-bottom: 48px;
+    }
+
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 20px;
+    }
+    .feature-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 28px;
+      transition: box-shadow 0.2s, transform 0.2s;
+    }
+    .feature-card:hover {
+      box-shadow: 0 8px 32px rgba(0,0,0,0.07);
+      transform: translateY(-2px);
+    }
+    .feature-icon {
+      width: 44px; height: 44px; border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+      margin-bottom: 16px; font-size: 1.3rem;
+    }
+    .icon-indigo { background: var(--indigo-lt); }
+    .icon-amber  { background: #fffbeb; }
+    .icon-green  { background: #ecfdf5; }
+    .icon-rose   { background: #fff1f2; }
+    .icon-purple { background: #f5f3ff; }
+    .icon-blue   { background: #eff6ff; }
+
+    .feature-card h3 {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 1rem; font-weight: 600;
+      margin-bottom: 8px;
+    }
+    .feature-card p {
+      font-size: 0.875rem; color: var(--ink-soft);
+      line-height: 1.6;
+    }
+
+    /* ── HOW IT WORKS ── */
+    .steps { display: flex; flex-direction: column; gap: 0; }
+    .step {
+      display: grid; grid-template-columns: 56px 1fr;
+      gap: 20px; position: relative; padding-bottom: 40px;
+    }
+    .step:last-child { padding-bottom: 0; }
+    .step-num-col { display: flex; flex-direction: column; align-items: center; }
+    .step-num {
+      width: 44px; height: 44px; border-radius: 50%;
+      background: var(--indigo); color: #fff;
+      font-family: 'Space Grotesk', sans-serif;
+      font-weight: 700; font-size: 1rem;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+    }
+    .step-line {
+      width: 2px; flex: 1; background: var(--border);
+      margin-top: 8px;
+    }
+    .step:last-child .step-line { display: none; }
+    .step-body { padding-top: 10px; }
+    .step-body h3 {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 1.05rem; font-weight: 600;
+      margin-bottom: 6px;
+    }
+    .step-body p { font-size: 0.875rem; color: var(--ink-soft); }
+
+    /* ── PRIVACY SECTION ── */
+    .privacy-section {
+      background: var(--ink);
+      color: #fff;
+      border-radius: 20px;
+      padding: 60px 5vw;
+      margin: 0 5vw 80px;
+    }
+    .privacy-section .section-label { color: #a5b4fc; }
+    .privacy-section .section-title { color: #fff; margin-bottom: 32px; }
+    .privacy-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 24px;
+    }
+    .privacy-item {
+      display: flex; gap: 14px;
+    }
+    .privacy-item-icon {
+      font-size: 1.4rem; flex-shrink: 0; margin-top: 2px;
+    }
+    .privacy-item h4 {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 0.95rem; font-weight: 600;
+      margin-bottom: 4px; color: #e0e7ff;
+    }
+    .privacy-item p {
+      font-size: 0.825rem; color: #94a3b8; line-height: 1.55;
+    }
+
+    /* ── FOOTER ── */
+    footer {
+      border-top: 1px solid var(--border);
+      padding: 36px 5vw;
+      display: flex; align-items: center; justify-content: space-between;
+      flex-wrap: wrap; gap: 16px;
+    }
+    .footer-logo {
+      font-family: 'Space Grotesk', sans-serif;
+      font-weight: 700; font-size: 1rem;
+      color: var(--ink); text-decoration: none;
+    }
+    .footer-links { display: flex; gap: 24px; }
+    .footer-links a {
+      font-size: 0.825rem; color: var(--ink-soft);
+      text-decoration: none;
+    }
+    .footer-links a:hover { color: var(--indigo); }
+    .footer-copy { font-size: 0.8rem; color: var(--ink-faint); width: 100%; }
+
+    @media (max-width: 600px) {
+      nav { padding: 0 4vw; }
+      .nav-links { gap: 16px; }
+      .privacy-strip { gap: 18px; }
+      footer { flex-direction: column; align-items: flex-start; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- NAV -->
+  <nav>
+    <a class="nav-logo" href="/">ExNo<span class="dot">Trk</span></a>
+    <div class="nav-links">
+      <a href="#features">Features</a>
+      <a href="#privacy">Privacy</a>
+      <a href="privacy.html">Privacy Policy</a>
+      <a href="support.html">Support</a>
+    </div>
+  </nav>
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="hero-badge">
+      <span class="pulse"></span>
+      Android App — Free to Use
+    </div>
+    <h1>Track notes, expenses<br />and splits — <em>privately</em></h1>
+    <p class="hero-sub">
+      ExNoTrk is an all-in-one Android app for personal notes, expense tracking,
+      budget monitoring, and group expense splitting. Everything runs on your device.
+      Your data stays yours.
+    </p>
+    <a class="hero-cta" href="https://play.google.com/store/apps/details?id=com.exnotrk.app">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2z"/><path d="M10 8l6 4-6 4V8z" fill="currentColor" stroke="none"/></svg>
+      Download on Google Play
+    </a>
+    <p class="hero-note">Free · No ads · No account required for basic use</p>
+
+    <div class="privacy-strip">
+      <div class="strip-item">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#6366f1" stroke-width="2.2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+        Data stays on your device
+      </div>
+      <div class="strip-item">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#6366f1" stroke-width="2.2"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg>
+        Works offline, always
+      </div>
+      <div class="strip-item">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#6366f1" stroke-width="2.2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+        No data sold or shared
+      </div>
+      <div class="strip-item">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#6366f1" stroke-width="2.2"><path d="M20 7H4a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2z"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>
+        Open source friendly
+      </div>
+    </div>
+  </section>
+
+  <!-- FEATURES -->
+  <section class="section" id="features">
+    <p class="section-label">What ExNoTrk does</p>
+    <h2 class="section-title">Everything in one app,<br />nothing you don't need</h2>
+
+    <div class="features-grid">
+      <div class="feature-card">
+        <div class="feature-icon icon-indigo">📝</div>
+        <h3>Smart Notes</h3>
+        <p>Create rich notes with tags, colors, reminders, and voice-to-text. Organize into books and share via secure links.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon icon-amber">💰</div>
+        <h3>Expense Tracking</h3>
+        <p>Log expenses manually or let ExNoTrk auto-import from bank SMS messages. Set budgets and get alerts when you're close.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon icon-green">🤝</div>
+        <h3>Group Expense Split</h3>
+        <p>Create split groups, add members, record shared expenses, and settle up. Real-time sync keeps everyone on the same page.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon icon-rose">🔔</div>
+        <h3>Reminders</h3>
+        <p>Attach reminders to any note or expense. Never miss a bill payment or a task you set for yourself.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon icon-purple">☁️</div>
+        <h3>Google Drive Backup</h3>
+        <p>Optional encrypted backup to your own Google Drive. Restore on any device, anytime. Backup uses your Drive storage, not ours.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon icon-blue">🔗</div>
+        <h3>Secure Share Links</h3>
+        <p>Share notes or entire notebooks with anyone via a link. Set view-only or edit access, with automatic 30-day expiry.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- HOW IT WORKS -->
+  <section class="section">
+    <p class="section-label">How it works</p>
+    <h2 class="section-title">Up and running in minutes</h2>
+
+    <div class="steps">
+      <div class="step">
+        <div class="step-num-col">
+          <div class="step-num">1</div>
+          <div class="step-line"></div>
+        </div>
+        <div class="step-body">
+          <h3>Install the app</h3>
+          <p>Download ExNoTrk from the Google Play Store. No account needed to start — open the app and begin immediately.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num-col">
+          <div class="step-num">2</div>
+          <div class="step-line"></div>
+        </div>
+        <div class="step-body">
+          <h3>Add your notes and expenses</h3>
+          <p>Create notes, log your first expense, or set a monthly budget. Bank SMS auto-import sets up your expense history in seconds.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num-col">
+          <div class="step-num">3</div>
+          <div class="step-line"></div>
+        </div>
+        <div class="step-body">
+          <h3>Split with your group</h3>
+          <p>Create a split group, share the invite code, and start adding shared expenses. ExNoTrk calculates who owes what automatically.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num-col">
+          <div class="step-num">4</div>
+          <div class="step-line"></div>
+        </div>
+        <div class="step-body">
+          <h3>Back up when you're ready</h3>
+          <p>Sign in with Google to enable Drive backup. Your data is encrypted before it leaves your device. Restore any time on any phone.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PRIVACY SECTION -->
+  <section id="privacy">
+    <div class="privacy-section">
+      <p class="section-label">Privacy first</p>
+      <h2 class="section-title">Your data never leaves<br />your control</h2>
+      <div class="privacy-grid">
+        <div class="privacy-item">
+          <div class="privacy-item-icon">📱</div>
+          <div>
+            <h4>On-device storage</h4>
+            <p>All notes and expenses are stored locally in an encrypted database on your phone. Nothing is uploaded without your action.</p>
+          </div>
+        </div>
+        <div class="privacy-item">
+          <div class="privacy-item-icon">📧</div>
+          <div>
+            <h4>Gmail read-only</h4>
+            <p>If you grant Gmail access, ExNoTrk reads only bank transaction emails to auto-import expenses. No emails are stored or transmitted.</p>
+          </div>
+        </div>
+        <div class="privacy-item">
+          <div class="privacy-item-icon">💬</div>
+          <div>
+            <h4>SMS stays on device</h4>
+            <p>Bank SMS messages are read locally for expense detection. They are never sent to any server — processing happens entirely on your phone.</p>
+          </div>
+        </div>
+        <div class="privacy-item">
+          <div class="privacy-item-icon">🗄️</div>
+          <div>
+            <h4>Your Drive, your backup</h4>
+            <p>Cloud backup goes directly into your personal Google Drive. ExNoTrk has no access to any Drive files outside the app's own folder.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer>
+    <a class="footer-logo" href="/">ExNoTrk</a>
+    <div class="footer-links">
+      <a href="privacy.html">Privacy Policy</a>
+      <a href="data-deletion.html">Data Deletion</a>
+      <a href="support.html">Support</a>
+    </div>
+    <p class="footer-copy">© 2025 ExNoTrk. Built by a solo developer. Contact: exnotrk.support@gmail.com</p>
+  </footer>
+
+</body>
+</html>
